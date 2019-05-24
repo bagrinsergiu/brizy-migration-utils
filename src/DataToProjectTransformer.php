@@ -21,7 +21,7 @@ class DataToProjectTransformer implements DataTransformerInterface {
 		$styles   = $this->getStyles( $context->getBuildPath() );
 		$fonts    = $this->getFonts( $context->getBuildPath() );
 
-		return $this->merge( $context->getGlobals(), $defaults, $styles, $fonts );
+		return $this->merge( $context->getData(), $defaults, $styles, $fonts );
 	}
 
 	/**
