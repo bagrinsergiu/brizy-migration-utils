@@ -10,35 +10,27 @@ use Brizy\Utils\UUId;
  */
 class DataToProjectTransformer implements DataTransformerInterface {
 
-	/**
-	 * @var string
-	 */
-	private $buildPath;
 
 	/**
-	 * DataToProjectMigration constructor.
-	 *
-	 * @param $buildPath
-	 */
-	public function __construct( $buildPath ) {
-		$this->buildPath = $buildPath;
-	}
-
-	/**
-	 * @param $gb
+	 * @param DataToProjectContext $context
 	 *
 	 * @return mixed
 	 */
-	public function execute( $gb ) {
-		$defaults = $this->getDefaults();
-		$styles   = $this->getStyles();
-		$fonts    = $this->getFonts();
+	public function execute( TransformerContext $context ) {
+		$defaults = $this->getDefaults( $context->getBuildPath() );
+		$styles   = $this->getStyles( $context->getBuildPath() );
+		$fonts    = $this->getFonts( $context->getBuildPath() );
 
-		return $this->merge( $gb, $defaults, $styles, $fonts );
+		return $this->merge( $context->getGlobals(), $defaults, $styles, $fonts );
 	}
 
-	private function getStyles() {
-		$templates = json_decode( file_get_contents( $this->buildPath .
+	/**
+	 * @param $buildPath
+	 *
+	 * @return array
+	 */
+	private function getStyles( $buildPath ) {
+		$templates = json_decode( file_get_contents( $buildPath .
 		                                             DIRECTORY_SEPARATOR . "templates" .
 		                                             DIRECTORY_SEPARATOR . "meta.json" ) );
 		$result    = array();
@@ -52,8 +44,13 @@ class DataToProjectTransformer implements DataTransformerInterface {
 		return $result;
 	}
 
-	private function getFonts() {
-		$fonts  = json_decode( file_get_contents( $this->buildPath .
+	/**
+	 * @param $buildPath
+	 *
+	 * @return array
+	 */
+	private function getFonts( $buildPath ) {
+		$fonts  = json_decode( file_get_contents( $buildPath .
 		                                          DIRECTORY_SEPARATOR . "googleFonts.json" ) );
 		$result = array();
 
@@ -64,6 +61,12 @@ class DataToProjectTransformer implements DataTransformerInterface {
 		return $result;
 	}
 
+	/**
+	 * @param $styles
+	 * @param $id
+	 *
+	 * @return |null
+	 */
 	private function getStyle( $styles, $id ) {
 		foreach ( $styles as $style ) {
 			if ( $style && $style->id === $id ) {
@@ -74,11 +77,24 @@ class DataToProjectTransformer implements DataTransformerInterface {
 		return null;
 	}
 
-	private function getDefaults() {
-		return json_decode( file_get_contents( $this->buildPath .
+	/**
+	 * @param $buildPath
+	 *
+	 * @return mixed
+	 */
+	private function getDefaults( $buildPath ) {
+		return json_decode( file_get_contents( $buildPath .
 		                                       DIRECTORY_SEPARATOR . "defaults.json" ) );
 	}
 
+	/**
+	 * @param $globals
+	 * @param $default
+	 * @param $styles
+	 * @param $fonts
+	 *
+	 * @return mixed
+	 */
 	private function merge( $globals, $default, $styles, $fonts ) {
 		$result = $default;
 

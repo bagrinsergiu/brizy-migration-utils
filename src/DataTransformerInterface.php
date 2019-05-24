@@ -9,9 +9,9 @@ namespace Brizy;
 interface DataTransformerInterface {
 
 	/**
-	 * @param $data
+	 * @param TransformerContext $context
 	 *
 	 * @return mixed
 	 */
-	public function execute( $data );
+	public function execute( TransformerContext $context );
 }
