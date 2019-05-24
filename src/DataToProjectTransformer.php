@@ -2,7 +2,13 @@
 
 namespace Brizy;
 
-class DataToProjectMigration implements DataMigrationInterface {
+use Brizy\Utils\UUId;
+
+/**
+ * Class DataToProjectTransformer
+ * @package Brizy
+ */
+class DataToProjectTransformer implements DataTransformerInterface {
 
 	/**
 	 * @var string
@@ -64,6 +70,8 @@ class DataToProjectMigration implements DataMigrationInterface {
 				return $style;
 			}
 		}
+
+		return null;
 	}
 
 	private function getDefaults() {
@@ -84,7 +92,7 @@ class DataToProjectMigration implements DataMigrationInterface {
 					$fontFamilyToKey = preg_replace( '/\s+/', '_', strtolower( $font->family ) );
 
 					if ( $fontKey === $fontFamilyToKey ) {
-						$font->brizyId = self::uuid();
+						$font->brizyId = UUId::uuid();
 						$finalFonts[]  = $font;
 					}
 				}
@@ -121,7 +129,7 @@ class DataToProjectMigration implements DataMigrationInterface {
 		// styles -> copy others
 		if ( isset ( $globals->styles ) ) {
 			foreach ( $globals->styles as $id => $data ) {
-				$style = self::getStyle( $styles, $id );
+				$style = $this->getStyle( $styles, $id );
 				if ( ! is_object( $style ) ) {
 					continue;
 				}
@@ -142,7 +150,7 @@ class DataToProjectMigration implements DataMigrationInterface {
 			}
 		}
 		if ( ! $selected_style_data_present ) {
-			$selected_style = self::getStyle( $styles, $result->selectedStyle );
+			$selected_style = $this->getStyle( $styles, $result->selectedStyle );
 			if ( is_object( $selected_style ) ) {
 				$result->styles[] = (object) array(
 					"id"           => $selected_style->id,
@@ -156,13 +164,5 @@ class DataToProjectMigration implements DataMigrationInterface {
 		return $result;
 	}
 
-	private function uuid( $n = 32 ) {
-		$randomString = '';
 
-		for ( $i = 0; $i < $n; $i ++ ) {
-			$randomString .= chr( rand( 97, 122 ) );
-		}
-
-		return $randomString;
-	}
 }
