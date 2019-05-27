@@ -2,57 +2,64 @@
 
 namespace Brizy;
 
-class ConditionsContext extends TransformerContext
-{
-  /**
-   * @var array
-   */
-  private $globalBlocks;
+class ConditionsContext extends TransformerContext {
+	/**
+	 * @var array
+	 */
+	private $globalBlocks;
 
-  /**
-   * @var array
-   */
-  private $config;
+	/**
+	 * @var array
+	 */
+	private $config;
 
-  /**
-   * ConditionsContext constructor.
-   *
-   * @param $pageData
-   * @param $globalBlocks
-   * @param $config
-   */
-  public function __construct($pageData, $globalBlocks, $config)
-  {
-    parent::__construct($pageData);
-    $this->globalBlocks = $globalBlocks;
-    $this->config = $config;
-  }
+	/**
+	 * ConditionsContext constructor.
+	 *
+	 * @param $pageData
+	 * @param $globalBlocks
+	 * @param $config
+	 */
+	public function __construct( $pageData, $globalBlocks, $config ) {
+		parent::__construct( $pageData );
+		$this->globalBlocks = $globalBlocks;
+		$this->config       = $config;
+	}
 
-  /**
-   * @return array
-   */
-  public function getGlobalBlocks()
-  {
-    return $this->globalBlocks;
-  }
+	/**
+	 * @return array
+	 */
+	public function getGlobalBlocks() {
+		return $this->globalBlocks;
+	}
 
-  /**
-   * @param string $globalBlocks
-   *
-   * @return ConditionsContext
-   */
-  public function setGlobalBlocks($globalBlocks)
-  {
-    $this->globalBlocks = $globalBlocks;
+	/**
+	 * @param array $globalBlocks
+	 *
+	 * @return ConditionsContext
+	 */
+	public function setGlobalBlocks( $globalBlocks ) {
+		$this->globalBlocks = $globalBlocks;
 
-    return $this;
-  }
+		return $this;
+	}
 
-  /**
-   * @return array
-   */
-  public function getConfig()
-  {
-    return $this->config;
-  }
+	/**
+	 * @return array
+	 */
+	public function getConfig() {
+		return $this->config;
+	}
+
+	/**
+	 * @param array $config
+	 *
+	 * @return ConditionsContext
+	 */
+	public function setConfig( $config ) {
+		$this->config = $config;
+
+		return $this;
+	}
+
 }
