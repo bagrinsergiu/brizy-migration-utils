@@ -2,7 +2,7 @@
 
 namespace Brizy;
 
-class ConditionsContext extends TransformerContext {
+class ConditionsContext extends Context {
 	/**
 	 * @var array
 	 */
@@ -12,19 +12,6 @@ class ConditionsContext extends TransformerContext {
 	 * @var array
 	 */
 	private $config;
-
-	/**
-	 * ConditionsContext constructor.
-	 *
-	 * @param $pageData
-	 * @param $globalBlocks
-	 * @param $config
-	 */
-	public function __construct( $pageData, $globalBlocks, $config ) {
-		parent::__construct( $pageData );
-		$this->globalBlocks = $globalBlocks;
-		$this->config       = $config;
-	}
 
 	/**
 	 * @return array

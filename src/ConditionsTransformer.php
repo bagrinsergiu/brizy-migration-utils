@@ -3,23 +3,27 @@
 namespace Brizy;
 
 use Brizy\Utils\Conditions;
+use function json_encode;
+use stdClass;
 
 /**
  * Class ConditionsTransformer
  * @package Brizy
  */
-class ConditionsTransformer implements ConditionsInterface {
+class ConditionsTransformer implements DataTransformerInterface {
 	/**
 	 * @param ConditionsContext $context
 	 *
 	 * @return TransformerContext|mixed
 	 */
-	public function execute( TransformerContext $context ) {
+	public function execute( ContextInterface $context ) {
 		//$this->page = json_decode($context->getData());
 		//$this->globalBlocks = json_decode($context->getGlobalBlocks());
 		//$this->options = json_decode($context->getConfig());
 		$this->transformPageData( $context );
 		$this->getGlobalBlocks( $context );
+
+		return $context;
 	}
 
 //  public function getMigratedData()
@@ -58,12 +62,14 @@ class ConditionsTransformer implements ConditionsInterface {
 		);
 
 		$context->getData()->data->items = $newBlocks;
+
+		return $context;
 	}
 
 	/**
 	 * @param ConditionsContext $context
 	 *
-	 * @return array
+	 * @return ConditionsContext
 	 */
 	private function getGlobalBlocks( ConditionsContext $context ) {
 		$sortedGlobalBlocks = $context->getGlobalBlocks();
@@ -85,8 +91,16 @@ class ConditionsTransformer implements ConditionsInterface {
 
 		$this->insertSurroundedGlobalBlocks( $context, "bottom" );
 		$this->insertSurroundedGlobalBlocks( $context, "top" );
+
+		return $context;
 	}
 
+	/**
+	 * @param ConditionsContext $context
+	 * @param $type
+	 *
+	 * @return ConditionsContext
+	 */
 	private function insertSurroundedGlobalBlocks( ConditionsContext $context, $type ) {
 		$globalBlocks = $context->getGlobalBlocks();
 		//$globalBlocksAsObject = Conditions::turnIntoObject( $this->globalBlocks );
@@ -146,13 +160,20 @@ class ConditionsTransformer implements ConditionsInterface {
 			array_push( $newGlobalBlocks, $value );
 		}
 
-    $context->setGlobalBlocks( $newGlobalBlocks );
-  }
+		$context->setGlobalBlocks( $newGlobalBlocks );
 
+		return $context;
+	}
+
+	/**
+	 * @param $config
+	 *
+	 * @return stdClass
+	 */
 	private function getCurrentRule( $config ) {
 		$PAGES_GROUP_ID      = 1;
 		$POST_GROUP_ID       = 1;
-		$CATEGORIES_GROUP_ID = 2;
+//		$CATEGORIES_GROUP_ID = 2;
 		$TEMPLATES_GROUP_ID  = 16;
 
 		$PAGE_TYPE     = "page";

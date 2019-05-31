@@ -4,7 +4,7 @@
 namespace Brizy;
 
 
-class DataToProjectContext extends TransformerContext {
+class DataToProjectContext extends Context {
 
 
 	/**

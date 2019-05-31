@@ -16,7 +16,7 @@ class DataToProjectTransformer implements DataTransformerInterface {
 	 *
 	 * @return mixed
 	 */
-	public function execute( TransformerContext $context ) {
+	public function execute( ContextInterface $context ) {
 		$defaults = $this->getDefaults( $context->getBuildPath() );
 		$styles   = $this->getStyles( $context->getBuildPath() );
 		$fonts    = $this->getFonts( $context->getBuildPath() );
