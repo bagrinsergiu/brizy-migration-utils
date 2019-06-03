@@ -2,7 +2,6 @@
 
 namespace Brizy;
 
-use Brizy\Utils\Conditions;
 use stdClass;
 
 /**
@@ -73,7 +72,7 @@ class ConditionsTransformer implements DataTransformerInterface {
 	private function getGlobalBlocks( ConditionsContext $context ) {
 		$sortedGlobalBlocks = $context->getGlobalBlocks();
 
-		usort( $sortedGlobalBlocks, function ( $a, $b ) {
+		uasort( $sortedGlobalBlocks, function ( $a, $b ) {
 			if ( ! isset( $a->position ) && ! isset( $b->position ) ) {
 				return 0;
 			} elseif (
