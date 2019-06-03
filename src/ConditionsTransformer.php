@@ -45,10 +45,10 @@ class ConditionsTransformer implements DataTransformerInterface {
 			function ( $acc, $block ) use ( $surroundedBlocks ) {
 				$isTopCondition    =
 					$this->isConditionBlock( $block ) &&
-					in_array( $block->value->globalBlockId, $surroundedBlocks['top'] );
+					isset( $surroundedBlocks['top'] ) && in_array( $block->value->globalBlockId, $surroundedBlocks['top'] );
 				$isBottomCondition =
 					$this->isConditionBlock( $block ) &&
-					in_array( $block->value->globalBlockId, $surroundedBlocks['bottom'] );
+					isset( $surroundedBlocks['bottom'] ) && in_array( $block->value->globalBlockId, $surroundedBlocks['bottom'] );
 
 				if ( ! $isTopCondition && ! $isBottomCondition ) {
 					array_push( $acc, $block );
@@ -142,7 +142,9 @@ class ConditionsTransformer implements DataTransformerInterface {
 				$newGlobalBlock->rules = new stdClass();
 				$newGlobalBlock->rules = $currentRule;
 			}
-			array_push( $surroundedGlobalBlocks, $newGlobalBlock );
+
+			$surroundedGlobalBlocks[ $uid ] = $newGlobalBlock;
+			//array_push( $surroundedGlobalBlocks, $newGlobalBlock );
 		}
 
 		array_splice( $newSortedBlocks, $insertIndex, 0, $surroundedGlobalBlocks );
