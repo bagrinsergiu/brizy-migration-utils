@@ -3,7 +3,6 @@
 namespace Brizy;
 
 use Brizy\Utils\Conditions;
-use function json_encode;
 use stdClass;
 
 /**
@@ -40,16 +39,16 @@ class ConditionsTransformer implements DataTransformerInterface {
 	 */
 	private function transformPageData( ConditionsContext $context ) {
 		$blocks           = $context->getData()->data->items;
-		$surroundedBlocks = Conditions::getSurroundedIds( $blocks );
+		$surroundedBlocks = $this->getSurroundedIds( $blocks );
 
 		$newBlocks = array_reduce(
 			$blocks,
 			function ( $acc, $block ) use ( $surroundedBlocks ) {
 				$isTopCondition    =
-					Conditions::isConditionBlock( $block ) &&
+					$this->isConditionBlock( $block ) &&
 					in_array( $block->value->globalBlockId, $surroundedBlocks['top'] );
 				$isBottomCondition =
-					Conditions::isConditionBlock( $block ) &&
+					$this->isConditionBlock( $block ) &&
 					in_array( $block->value->globalBlockId, $surroundedBlocks['bottom'] );
 
 				if ( ! $isTopCondition && ! $isBottomCondition ) {
@@ -105,7 +104,7 @@ class ConditionsTransformer implements DataTransformerInterface {
 		$globalBlocks = $context->getGlobalBlocks();
 		//$globalBlocksAsObject = Conditions::turnIntoObject( $this->globalBlocks );
 		$blocks           = $context->getData()->data->items;
-		$surroundedBlocks = Conditions::getSurroundedIds( $blocks );
+		$surroundedBlocks = $this->getSurroundedIds( $blocks );
 
 		$prevGlobalBlock  = null;
 		$surroundedBlocks = $surroundedBlocks[ $type ];
@@ -126,7 +125,7 @@ class ConditionsTransformer implements DataTransformerInterface {
 			} )
 		);
 
-		$topLength = Conditions::array_count( $globalBlocks, function ( $value ) {
+		$topLength = $this->array_count( $globalBlocks, function ( $value ) {
 			return isset( $value->position ) && $value->position->align === "top";
 		} );
 
@@ -171,10 +170,10 @@ class ConditionsTransformer implements DataTransformerInterface {
 	 * @return stdClass
 	 */
 	private function getCurrentRule( $config ) {
-		$PAGES_GROUP_ID      = 1;
-		$POST_GROUP_ID       = 1;
+		$PAGES_GROUP_ID = 1;
+		$POST_GROUP_ID  = 1;
 //		$CATEGORIES_GROUP_ID = 2;
-		$TEMPLATES_GROUP_ID  = 16;
+		$TEMPLATES_GROUP_ID = 16;
 
 		$PAGE_TYPE     = "page";
 		$POST_TYPE     = "post";
@@ -198,5 +197,51 @@ class ConditionsTransformer implements DataTransformerInterface {
 		}
 
 		return $result;
+	}
+
+	private function getSurroundedIds( $blocks ) {
+		$top    = array();
+		$bottom = array();
+
+		if ( count( $blocks ) > 0 ) {
+			$i = 0;
+			while ( $i <= count( $blocks ) - 1 ) {
+				$currentBlock = $blocks[ $i ];
+				if ( $currentBlock->type === "GlobalBlock" ) {
+					array_push( $top, $currentBlock->value->globalBlockId );
+				} else {
+					break;
+				}
+				$i ++;
+			}
+
+			$i = 0;
+			while ( $i <= count( $blocks ) - 1 ) {
+				$currentBlock = $blocks[ count( $blocks ) - 1 - $i ];
+				if ( $currentBlock->type === "GlobalBlock" ) {
+					array_push( $bottom, $currentBlock->value->globalBlockId );
+				} else {
+					break;
+				}
+				$i ++;
+			}
+		}
+
+		return array( $top, $bottom );
+	}
+
+	private function isConditionBlock( $block ) {
+		return $block->type === "GlobalBlock";
+	}
+
+	private function array_count( $arr, $callback ) {
+		$i = 0;
+		foreach ( $arr as $value ) {
+			if ( $callback( $value ) ) {
+				$i ++;
+			}
+		}
+
+		return $i;
 	}
 }
