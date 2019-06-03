@@ -38,7 +38,7 @@ class ConditionsTransformer implements DataTransformerInterface {
 	 * @return mixed
 	 */
 	private function transformPageData( ConditionsContext $context ) {
-		$blocks           = $context->getData()->data->items;
+		$blocks           = $context->getData()->items;
 		$surroundedBlocks = $this->getSurroundedIds( $blocks );
 
 		$newBlocks = array_reduce(
@@ -60,7 +60,7 @@ class ConditionsTransformer implements DataTransformerInterface {
 			[]
 		);
 
-		$context->getData()->data->items = $newBlocks;
+		$context->getData()->items = $newBlocks;
 
 		return $context;
 	}
@@ -103,7 +103,7 @@ class ConditionsTransformer implements DataTransformerInterface {
 	private function insertSurroundedGlobalBlocks( ConditionsContext $context, $type ) {
 		$globalBlocks = $context->getGlobalBlocks();
 		//$globalBlocksAsObject = Conditions::turnIntoObject( $this->globalBlocks );
-		$blocks           = $context->getData()->data->items;
+		$blocks           = $context->getData()->items;
 		$surroundedBlocks = $this->getSurroundedIds( $blocks );
 
 		$prevGlobalBlock  = null;
