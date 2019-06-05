@@ -114,7 +114,9 @@ class DataToProjectTransformer implements DataTransformerInterface {
 				}
 			}
 
-			$result->fonts->google->data = $finalFonts;
+			if ( isset( $result->fonts->google ) ) {
+				$result->fonts->google = (object) array( 'data' => $finalFonts );
+			}
 
 			unset( $globals->extraFonts );
 		}
