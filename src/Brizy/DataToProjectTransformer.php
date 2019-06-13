@@ -9,179 +9,213 @@ use Brizy\Utils\UUId;
  * Class DataToProjectTransformer
  * @package Brizy
  */
-class DataToProjectTransformer implements DataTransformerInterface {
+class DataToProjectTransformer implements DataTransformerInterface
+{
 
 
-	/**
-	 * @param DataToProjectContext $context
-	 *
-	 * @return mixed
-	 */
-	public function execute( ContextInterface $context ) {
-		$defaults = $this->getDefaults( $context->getBuildPath() );
-		$styles   = $this->getStyles( $context->getBuildPath() );
-		$fonts    = $this->getFonts( $context->getBuildPath() );
+    /**
+     * @param DataToProjectContext $context
+     *
+     * @return mixed
+     */
+    public function execute(ContextInterface $context)
+    {
+        $defaults = $this->getDefaults($context->getBuildPath());
+        $styles = $this->getStyles($context->getBuildPath());
+        $fonts = $this->getFonts($context->getBuildPath());
 
-		return $this->merge( $context->getData(), $defaults, $styles, $fonts );
-	}
+        return $this->merge($context->getData(), $defaults, $styles, $fonts);
+    }
 
-	/**
-	 * @param $buildPath
-	 *
-	 * @return array
-	 */
-	private function getStyles( $buildPath ) {
-		$templates = json_decode( file_get_contents( $buildPath .
-		                                             DIRECTORY_SEPARATOR . "templates" .
-		                                             DIRECTORY_SEPARATOR . "meta.json" ) );
-		$result    = array();
+    /**
+     * @param $buildPath
+     *
+     * @return array
+     */
+    private function getStyles($buildPath)
+    {
+        $templates = json_decode(
+            file_get_contents(
+                $buildPath.
+                DIRECTORY_SEPARATOR."templates".
+                DIRECTORY_SEPARATOR."meta.json"
+            )
+        );
+        $result = array();
 
-		foreach ( $templates->templates as $template ) {
-			foreach ( $template->styles as $style ) {
-				$result[] = $style;
-			}
-		}
+        foreach ($templates->templates as $template) {
+            foreach ($template->styles as $style) {
+                $result[] = $style;
+            }
+        }
 
-		return $result;
-	}
+        return $result;
+    }
 
-	/**
-	 * @param $buildPath
-	 *
-	 * @return array
-	 */
-	private function getFonts( $buildPath ) {
-		$fonts  = json_decode( file_get_contents( $buildPath .
-		                                          DIRECTORY_SEPARATOR . "googleFonts.json" ) );
-		$result = array();
+    /**
+     * @param $buildPath
+     *
+     * @return array
+     */
+    private function getFonts($buildPath)
+    {
+        $fonts = json_decode(
+            file_get_contents(
+                $buildPath.
+                DIRECTORY_SEPARATOR."googleFonts.json"
+            )
+        );
+        $result = array();
 
-		foreach ( $fonts->items as $font ) {
-			$result[] = $font;
-		}
+        foreach ($fonts->items as $font) {
+            $result[] = $font;
+        }
 
-		return $result;
-	}
+        return $result;
+    }
 
-	/**
-	 * @param $styles
-	 * @param $id
-	 *
-	 * @return |null
-	 */
-	private function getStyle( $styles, $id ) {
-		foreach ( $styles as $style ) {
-			if ( $style && $style->id === $id ) {
-				return $style;
-			}
-		}
+    /**
+     * @param $styles
+     * @param $id
+     *
+     * @return | null
+     */
+    private function getStyle($styles, $id)
+    {
+        foreach ($styles as $style) {
+            if ($style && $style->id === $id) {
+                return $style;
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * @param $buildPath
-	 *
-	 * @return mixed
-	 */
-	private function getDefaults( $buildPath ) {
-		return json_decode( file_get_contents( $buildPath .
-		                                       DIRECTORY_SEPARATOR . "defaults.json" ) );
-	}
+    /**
+     * @param $buildPath
+     *
+     * @return mixed
+     */
+    private function getDefaults($buildPath)
+    {
+        return json_decode(
+            file_get_contents(
+                $buildPath.
+                DIRECTORY_SEPARATOR."defaults.json"
+            )
+        );
+    }
 
-	/**
-	 * @param $globals
-	 * @param $default
-	 * @param $styles
-	 * @param $fonts
-	 *
-	 * @return mixed
-	 */
-	private function merge( $globals, $default, $styles, $fonts ) {
-		$result = $default;
+    /**
+     * @param $styles
+     * @return array
+     */
+    private function addStyleFontType($styles)
+    {
+        $finalStyles = array();
 
-		// extraFont
-		if ( isset( $globals->extraFonts ) ) {
-			$extraFonts = $globals->extraFonts;
-			$finalFonts = array();
+        foreach ($styles as $style) {
+            $style->fontType = "google";
+            $finalStyles[] = $style;
+        }
 
-			foreach ( $extraFonts as $fontKey ) {
-				foreach ( $fonts as $font ) {
-					$fontFamilyToKey = preg_replace( '/\s+/', '_', strtolower( $font->family ) );
+        return $finalStyles;
+    }
 
-					if ( $fontKey === $fontFamilyToKey ) {
-						$font->brizyId = UUId::uuid();
-						$finalFonts[]  = $font;
-					}
-				}
-			}
+    /**
+     * @param $globals
+     * @param $default
+     * @param $styles
+     * @param $fonts
+     *
+     * @return mixed
+     */
+    private function merge($globals, $default, $styles, $fonts)
+    {
+        $result = $default;
 
-			if ( isset( $result->fonts->google ) ) {
-				$result->fonts->google = (object) array( 'data' => $finalFonts );
-			}
+        // extraFont
+        if (isset($globals->extraFonts)) {
+            $extraFonts = $globals->extraFonts;
+            $finalFonts = array();
 
-			unset( $globals->extraFonts );
-		}
+            foreach ($extraFonts as $fontKey) {
+                foreach ($fonts as $font) {
+                    $fontFamilyToKey = preg_replace('/\s+/', '_', strtolower($font->family));
 
-		// selectedStyle
-		if ( isset( $globals->styles ) && isset( $globals->styles->_selected ) ) {
-			$result->selectedStyle = $globals->styles->_selected;
+                    if ($fontKey === $fontFamilyToKey) {
+                        $font->brizyId = UUId::uuid();
+                        $finalFonts[] = $font;
+                    }
+                }
+            }
 
-			unset( $globals->styles->_selected );
-		}
+            if (isset($result->fonts->google)) {
+                $result->fonts->google = (object)array('data' => $finalFonts);
+            }
 
-		// extraFontStyles
-		if ( isset( $globals->styles ) && isset( $globals->styles->_extraFontStyles ) ) {
-			$result->extraFontStyles = $globals->styles->_extraFontStyles;
+            unset($globals->extraFonts);
+        }
 
-			unset( $globals->styles->_extraFontStyles );
-		}
+        // selectedStyle
+        if (isset($globals->styles) && isset($globals->styles->_selected)) {
+            $result->selectedStyle = $globals->styles->_selected;
 
-		// styles
-		// styles -> copy default
-		if ( isset( $globals->styles ) && isset( $globals->styles->default ) ) {
-			$result->styles[0]->colorPalette = $globals->styles->default->colorPalette;
-			$result->styles[0]->fontStyles   = $globals->styles->default->fontStyles;
+            unset($globals->styles->_selected);
+        }
 
-			unset( $globals->styles->default );
-		}
+        // extraFontStyles
+        if (isset($globals->styles) && isset($globals->styles->_extraFontStyles)) {
+            $result->extraFontStyles = $this->addStyleFontType($globals->styles->_extraFontStyles);
+            unset($globals->styles->_extraFontStyles);
+        }
 
-		// styles -> copy others
-		if ( isset ( $globals->styles ) ) {
-			foreach ( $globals->styles as $id => $data ) {
-				$style = $this->getStyle( $styles, $id );
-				if ( ! is_object( $style ) ) {
-					continue;
-				}
-				$result->styles[] = (object) array(
-					"id"           => $id,
-					"title"        => $style->title,
-					"colorPalette" => $data->colorPalette,
-					"fontStyles"   => $data->fontStyles
-				);
-			}
-		}
+        // styles
+        // styles -> copy default
+        if (isset($globals->styles) && isset($globals->styles->default)) {
+            $result->styles[0]->colorPalette = $globals->styles->default->colorPalette;
+            $result->styles[0]->fontStyles = $this->addStyleFontType($globals->styles->default->fontStyles);
 
-		// styles -> missing selected style data
-		$selected_style_data_present = false;
-		foreach ( $result->styles as $style ) {
-			if ( $style->id === $result->selectedStyle ) {
-				$selected_style_data_present = true;
-			}
-		}
-		if ( ! $selected_style_data_present ) {
-			$selected_style = $this->getStyle( $styles, $result->selectedStyle );
-			if ( is_object( $selected_style ) ) {
-				$result->styles[] = (object) array(
-					"id"           => $selected_style->id,
-					"title"        => $selected_style->title,
-					"colorPalette" => $selected_style->colorPalette,
-					"fontStyles"   => $selected_style->fontStyles
-				);
-			}
-		}
+            unset($globals->styles->default);
+        }
 
-		return $result;
-	}
+        // styles -> copy others
+        if (isset ($globals->styles)) {
+            foreach ($globals->styles as $id => $data) {
+                $style = $this->getStyle($styles, $id);
+                if (!is_object($style)) {
+                    continue;
+                }
+                $result->styles[] = (object)array(
+                    "id" => $id,
+                    "title" => $style->title,
+                    "colorPalette" => $data->colorPalette,
+                    "fontStyles" => $this->addStyleFontType($data->fontStyles),
+                );
+            }
+        }
+
+        // styles -> missing selected style data
+        $selected_style_data_present = false;
+        foreach ($result->styles as $style) {
+            if ($style->id === $result->selectedStyle) {
+                $selected_style_data_present = true;
+            }
+        }
+        if (!$selected_style_data_present) {
+            $selected_style = $this->getStyle($styles, $result->selectedStyle);
+            if (is_object($selected_style)) {
+                $result->styles[] = (object)array(
+                    "id" => $selected_style->id,
+                    "title" => $selected_style->title,
+                    "colorPalette" => $selected_style->colorPalette,
+                    "fontStyles" => $this->addStyleFontType($selected_style->fontStyles),
+                );
+            }
+        }
+
+        return $result;
+    }
 
 
 }
