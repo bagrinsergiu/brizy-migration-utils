@@ -115,7 +115,7 @@ class DataToProjectTransformer implements DataTransformerInterface
         $finalStyles = array();
 
         foreach ($styles as $style) {
-            $style->fontType = "google";
+            $style->fontFamilyType = "google";
             $finalStyles[] = $style;
         }
 
