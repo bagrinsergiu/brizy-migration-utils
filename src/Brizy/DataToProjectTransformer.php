@@ -98,12 +98,31 @@ class DataToProjectTransformer implements DataTransformerInterface
      */
     private function getDefaults($buildPath)
     {
-        return json_decode(
+        $data = json_decode(
             file_get_contents(
                 $buildPath.
-                DIRECTORY_SEPARATOR."defaults.json"
+                DIRECTORY_SEPARATOR."defaultData.json"
             )
         );
+        $styles = json_decode(
+            file_get_contents(
+                $buildPath.
+                DIRECTORY_SEPARATOR."defaultStyles.json"
+            )
+        );
+        $fonts = json_decode(
+            file_get_contents(
+                $buildPath.
+                DIRECTORY_SEPARATOR."defaultFonts.json"
+            )
+        );
+
+        return array(
+            'data' => $data,
+            'styles' => $styles,
+            'fonts' => $fonts,
+        );
+
     }
 
     /**
@@ -132,7 +151,9 @@ class DataToProjectTransformer implements DataTransformerInterface
      */
     private function merge($globals, $default, $styles, $fonts)
     {
-        $result = $default;
+        $resultData = $default->data;
+        $resultStyles = $default->styles;
+        $resultFonts = $default->fonts;
 
         // extraFont
         if (isset($globals->extraFonts)) {
@@ -150,29 +171,29 @@ class DataToProjectTransformer implements DataTransformerInterface
                 }
             }
 
-            $result->fonts->google = (object)array('data' => $finalFonts);
+            $resultFonts->google = (object)array('data' => $finalFonts);
 
             unset($globals->extraFonts);
         }
 
         // selectedStyle
         if (isset($globals->styles) && isset($globals->styles->_selected)) {
-            $result->selectedStyle = $globals->styles->_selected;
+            $resultData->selectedStyle = $globals->styles->_selected;
 
             unset($globals->styles->_selected);
         }
 
         // extraFontStyles
         if (isset($globals->styles) && isset($globals->styles->_extraFontStyles)) {
-            $result->extraFontStyles = $this->addStyleFontType($globals->styles->_extraFontStyles);
+            $resultData->extraFontStyles = $this->addStyleFontType($globals->styles->_extraFontStyles);
             unset($globals->styles->_extraFontStyles);
         }
 
         // styles
         // styles -> copy default
         if (isset($globals->styles) && isset($globals->styles->default)) {
-            $result->styles[0]->colorPalette = $globals->styles->default->colorPalette;
-            $result->styles[0]->fontStyles = $this->addStyleFontType($globals->styles->default->fontStyles);
+            $resultStyles->styles[0]->colorPalette = $globals->styles->default->colorPalette;
+            $resultStyles->styles[0]->fontStyles = $this->addStyleFontType($globals->styles->default->fontStyles);
 
             unset($globals->styles->default);
         }
@@ -184,7 +205,7 @@ class DataToProjectTransformer implements DataTransformerInterface
                 if (!is_object($style)) {
                     continue;
                 }
-                $result->styles[] = (object)array(
+                $resultStyles->styles[] = (object)array(
                     "id" => $id,
                     "title" => $style->title,
                     "colorPalette" => $data->colorPalette,
@@ -195,15 +216,15 @@ class DataToProjectTransformer implements DataTransformerInterface
 
         // styles -> missing selected style data
         $selected_style_data_present = false;
-        foreach ($result->styles as $style) {
-            if ($style->id === $result->selectedStyle) {
+        foreach ($resultData->styles as $style) {
+            if ($style->id === $resultData->selectedStyle) {
                 $selected_style_data_present = true;
             }
         }
         if (!$selected_style_data_present) {
-            $selected_style = $this->getStyle($styles, $result->selectedStyle);
+            $selected_style = $this->getStyle($styles, $resultData->selectedStyle);
             if (is_object($selected_style)) {
-                $result->styles[] = (object)array(
+                $resultStyles->styles[] = (object)array(
                     "id" => $selected_style->id,
                     "title" => $selected_style->title,
                     "colorPalette" => $selected_style->colorPalette,
@@ -212,8 +233,10 @@ class DataToProjectTransformer implements DataTransformerInterface
             }
         }
 
-        return $result;
+        return array(
+            'data' => $resultData,
+            'styles' => $resultStyles,
+            'fonts' => $resultFonts,
+        );
     }
-
-
 }
