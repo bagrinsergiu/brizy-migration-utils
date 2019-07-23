@@ -36,9 +36,9 @@ class DataToProjectTransformer implements DataTransformerInterface
     {
         $templates = json_decode(
             file_get_contents(
-                $buildPath.
-                DIRECTORY_SEPARATOR."templates".
-                DIRECTORY_SEPARATOR."meta.json"
+                $buildPath .
+                DIRECTORY_SEPARATOR . "templates" .
+                DIRECTORY_SEPARATOR . "meta.json"
             )
         );
         $result = array();
@@ -61,8 +61,8 @@ class DataToProjectTransformer implements DataTransformerInterface
     {
         $fonts = json_decode(
             file_get_contents(
-                $buildPath.
-                DIRECTORY_SEPARATOR."googleFonts.json"
+                $buildPath .
+                DIRECTORY_SEPARATOR . "googleFonts.json"
             )
         );
         $result = array();
@@ -72,6 +72,42 @@ class DataToProjectTransformer implements DataTransformerInterface
         }
 
         return $result;
+    }
+
+    private function getStyleId($id)
+    {
+        $keyValue = array(
+            "default" => "kldugntsakdckzxhreidncqvgunudghrcuzv",
+            "Advisors" => "hhvfadskiuddpumderkrpfierxemmnfkkbdb",
+            "AlpineLodge" => "gkvpzagrxxxncblrivcrklhuxqlxuocpvxoi",
+            "Architekt" => "rtaizkhcpyvnsklrpneezuxfjbhxcgapvwzq",
+            "BaseGround" => "cwqlmorbdzpfjgeijdsucmmynmnvjjnhizgf",
+            "BeachResort" => "ogxvoqhdgowojrgovjtvfmgbdmtkrvfhzvut",
+            "CarClinic" => "sfacrfbudlqbjsohlttpgfdlcmpupwatrsqj",
+            "College" => "rrjgcxrizanoftyyjtlkpvxgboxzarhkjfpb",
+            "Creed" => "icwfpvkhphypjweexsymjpmobcndrdzvhypd",
+            "Flavour" => "wsndowxcdsndojazydvziriiurijzxxupmud",
+            "Gourmet" => "djgycpkivxkotophosklpovakaeglaphgeso",
+            "Hitched" => "ijwyqvltsbwnwwdgvsqbgazaafovftffjkeb",
+            "Hope" => "stclcsngwfgigirslshihqvfoffcvnuwutdo",
+            "InShape" => "yvabgehbjleqzdcbssoauoyeipqnrcctgsgf",
+            "Keynote" => "lywkwvivqbnmvopnhknegxidxkdhuglechhj",
+            "KidQuest" => "chnsxxxqibdfampcesxktddfoaftzkllzrem",
+            "Lavish" => "ldvzefmtepfgwsfrturzebeffqgrjygmvbpa",
+            "Molino" => "gznajvmfejckfmmzuabtsggydvuwqzzabzig",
+            "Moves" => "kqvgvsnfwhkwjwguzvsizkzdnpstlketofio",
+            "Parlor" => "eciislkkeivlbyblfujrudusvhkihlqtdura",
+            "Philanthropy" => "lnvuquwgkncpurwstjtvnamvymqgncggdgxm",
+            "Quantum" => "hkauzpefyxheerdsojcrzoznghmxyqxnpcos",
+            "ReelStory" => "zbncnqgfqctenhdippnnagyiwqrkblqykqfw",
+            "Skypoint" => "yvkltrdrjkjbolyedrpsprhaffytnuntjboy",
+            "Startapp" => "gwjxyiigrnkerwoorkywtgsfnfetztugngxc",
+            "Swipe" => "adodkqfglmmsgiwlrikyelxfaprxuwoeoemg",
+            "Wellness" => "pbbrkumtobavljgjvoqybsljdwhturhulobp",
+            "Yoga" => "pkfsnabwzdaviiiitkjgxdfxlslqbcapagwd"
+        );
+
+        return $keyValue[$id];
     }
 
     /**
@@ -100,8 +136,8 @@ class DataToProjectTransformer implements DataTransformerInterface
     {
         return json_decode(
             file_get_contents(
-                $buildPath.
-                DIRECTORY_SEPARATOR."defaults.json"
+                $buildPath .
+                DIRECTORY_SEPARATOR . "defaults.json"
             )
         );
     }
@@ -134,6 +170,11 @@ class DataToProjectTransformer implements DataTransformerInterface
     {
         $result = $default;
 
+        // Check if globals is object
+        if (!is_object($globals)) {
+            throw new \Exception();
+        }
+
         // extraFont
         if (isset($globals->extraFonts)) {
             $extraFonts = $globals->extraFonts;
@@ -157,7 +198,7 @@ class DataToProjectTransformer implements DataTransformerInterface
 
         // selectedStyle
         if (isset($globals->styles) && isset($globals->styles->_selected)) {
-            $result->selectedStyle = $globals->styles->_selected;
+            $result->selectedStyle = $this->getStyleId($globals->styles->_selected);
 
             unset($globals->styles->_selected);
         }
@@ -180,12 +221,13 @@ class DataToProjectTransformer implements DataTransformerInterface
         // styles -> copy others
         if (isset ($globals->styles)) {
             foreach ($globals->styles as $id => $data) {
-                $style = $this->getStyle($styles, $id);
+                $styleId = $this->getStyleId($id);
+                $style = $this->getStyle($styles, $styleId);
                 if (!is_object($style)) {
                     continue;
                 }
                 $result->styles[] = (object)array(
-                    "id" => $id,
+                    "id" => $styleId,
                     "title" => $style->title,
                     "colorPalette" => $data->colorPalette,
                     "fontStyles" => $this->addStyleFontType($data->fontStyles),
