@@ -1613,8 +1613,6 @@ class DataToProjectTransformerTest extends TestCase
             }
         }
 
-        echo json_encode($array);
-
         $this->assertTrue($existed, $message);
     }
 

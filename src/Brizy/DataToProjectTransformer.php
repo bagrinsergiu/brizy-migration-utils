@@ -203,6 +203,11 @@ class DataToProjectTransformer implements DataTransformerInterface
             unset($globals->styles->_selected);
         }
 
+        // copy defaultStyle
+        if (!isset($globals->styles)) {
+            $result->selectedStyle = $this->getStyleId("default");
+        }
+
         // extraFontStyles
         if (isset($globals->styles) && isset($globals->styles->_extraFontStyles)) {
             $result->extraFontStyles = $this->addStyleFontType($globals->styles->_extraFontStyles);
