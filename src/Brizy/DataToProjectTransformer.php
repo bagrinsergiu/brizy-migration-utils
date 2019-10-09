@@ -212,8 +212,13 @@ class DataToProjectTransformer implements DataTransformerInterface
         // styles
         // styles -> copy default
         if (isset($globals->styles) && isset($globals->styles->default)) {
-            $result->styles[0]->colorPalette = $globals->styles->default->colorPalette;
-            $result->styles[0]->fontStyles = $this->addStyleFontType($globals->styles->default->fontStyles);
+            foreach ($result->styles as $i => $style) {
+                // Copy in defaultStyle current styles
+                if ($style->id === $result->selectedStyle) {
+                    $result->styles[$i]->colorPalette = $globals->styles->default->colorPalette;
+                    $result->styles[$i]->fontStyles = $this->addStyleFontType($globals->styles->default->fontStyles);
+                }
+            }
 
             unset($globals->styles->default);
         }
@@ -256,6 +261,4 @@ class DataToProjectTransformer implements DataTransformerInterface
 
         return $result;
     }
-
-
 }

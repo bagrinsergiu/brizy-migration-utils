@@ -1587,6 +1587,43 @@ class DataToProjectTransformerTest extends TestCase
     public function testExecute($json)
     {
         $context = new DataToProjectContext(json_decode($json), "./tests/_data/editor-build");
+        $this->internalExecute($json, $context);
+    }
+
+    /**
+     * @dataProvider executeUseCases
+     */
+    public function testExecute2($json)
+    {
+        $context = new DataToProjectContext(json_decode($json), "./tests/_data/editor-build2");
+        $this->internalExecute($json, $context);
+    }
+
+    /**
+     * @param $array
+     * @param $property
+     * @param $value
+     */
+    private function assertObjectsFromArrayHasProperty($array, $property, $value, $message = "does not have property")
+    {
+        $existed = false;
+        foreach ($array as $data) {
+            if (is_object($data) && isset($data->$property) && $data->$property === $value) {
+                $existed = true;
+            }
+        }
+
+        echo json_encode($array);
+
+        $this->assertTrue($existed, $message);
+    }
+
+    /**
+     * @param $json
+     * @param DataToProjectContext $context
+     */
+    protected function internalExecute($json, DataToProjectContext $context): void
+    {
         $transformer = new DataToProjectTransformer();
 
         $data = $transformer->execute($context);
@@ -1627,23 +1664,6 @@ class DataToProjectTransformerTest extends TestCase
         if (isset($oldData->styles) && isset($oldData->styles->_extraFontStyles)) {
             $this->assertTrue(isset($data->extraFontStyles), "It should contain ExtraStyles");
         }
-    }
-
-    /**
-     * @param $array
-     * @param $property
-     * @param $value
-     */
-    private function assertObjectsFromArrayHasProperty($array, $property, $value, $message = "does not have property")
-    {
-
-        foreach ($array as $data) {
-            if (is_object($data) && isset($data->$property) && $data->$property === $value) {
-                return true;
-            }
-        }
-
-        $this->fail($message);
     }
 }
 
