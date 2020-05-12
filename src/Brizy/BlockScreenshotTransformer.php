@@ -31,13 +31,11 @@ class BlockScreenshotTransformer implements DataTransformerInterface {
 	 */
 	private function makeScreenshotAndType( $block ) {
 		return (object) [
-			"meta" => (object) array(
-				"type"             => $this->makeBlockType( $block ),
-				"_thumbnailSrc"    => isset( $block->value->_thumbnailSrc ) ? $block->value->_thumbnailSrc : null,
-				"_thumbnailWidth"  => isset( $block->value->_thumbnailWidth ) ? $block->value->_thumbnailWidth : null,
-				"_thumbnailHeight" => isset( $block->value->_thumbnailHeight ) ? $block->value->_thumbnailHeight : null,
-				"_thumbnailTime"   => isset( $block->value->_thumbnailTime ) ? $block->value->_thumbnailTime : null
-			)
+			"type"             => $this->makeBlockType( $block ),
+			"_thumbnailSrc"    => isset( $block->value->_thumbnailSrc ) ? $block->value->_thumbnailSrc : null,
+			"_thumbnailWidth"  => isset( $block->value->_thumbnailWidth ) ? $block->value->_thumbnailWidth : null,
+			"_thumbnailHeight" => isset( $block->value->_thumbnailHeight ) ? $block->value->_thumbnailHeight : null,
+			"_thumbnailTime"   => isset( $block->value->_thumbnailTime ) ? $block->value->_thumbnailTime : null
 		];
 	}
 
