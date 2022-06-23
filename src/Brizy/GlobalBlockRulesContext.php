@@ -9,7 +9,7 @@ class GlobalBlockRulesContext extends Context
     /**
      * @var array
      */
-    private array $collectionTypes;
+    private $collectionTypes;
 
     /**
      * GlobalBlockRulesContext constructor.
@@ -21,7 +21,6 @@ class GlobalBlockRulesContext extends Context
      */
     public function __construct($data, array $collectionTypes)
     {
-
         if (!is_object($data))
             throw new \Exception('$data invalid argument type. Object expected.');
 
@@ -35,7 +34,7 @@ class GlobalBlockRulesContext extends Context
     /**
      * @return array
      */
-    public function getCollectionTypes(): array
+    public function getCollectionTypes()
     {
         return $this->collectionTypes;
     }

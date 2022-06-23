@@ -6,7 +6,7 @@ namespace Brizy;
  * Class GlobalBlockRulesTransformer
  * @package Brizy
  */
-class GlobalBlockRulesTransformer extends \Brizy\GlobalBlockRulesContext implements DataTransformerInterface
+class GlobalBlockRulesTransformer implements DataTransformerInterface
 {
     /**
      * @param ContextInterface $context
@@ -17,7 +17,7 @@ class GlobalBlockRulesTransformer extends \Brizy\GlobalBlockRulesContext impleme
     public function execute(ContextInterface $context)
     {
         /**
-         * @var GlobalBlockRulesContext $context ;
+         * @var GlobalBlockRulesContext $context;
          */
 
         $data = $context->getData();
@@ -32,7 +32,7 @@ class GlobalBlockRulesTransformer extends \Brizy\GlobalBlockRulesContext impleme
      * @return object
      * @throws \Exception
      */
-    public function migrateRules($globalBlock, $collectionType): object
+    public function migrateRules($globalBlock, $collectionType)
     {
         $newGlobalBlock = $globalBlock;
 
@@ -117,7 +117,7 @@ class GlobalBlockRulesTransformer extends \Brizy\GlobalBlockRulesContext impleme
      * @param $rule
      * @return bool
      */
-    public function isItemRule($rule): bool
+    public function isItemRule($rule)
     {
         if (isset($rule->entityValues)) {
             return count($rule->entityValues) > 0;
@@ -130,7 +130,7 @@ class GlobalBlockRulesTransformer extends \Brizy\GlobalBlockRulesContext impleme
      * @param $id
      * @return bool
      */
-    private function getCollectionById($id): bool
+    private function getCollectionById($id)
     {
         $collectionTypes = $this->getCollectionTypes();
 

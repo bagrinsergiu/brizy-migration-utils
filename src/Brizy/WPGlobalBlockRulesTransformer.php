@@ -6,7 +6,7 @@ namespace Brizy;
  * Class WPGlobalBlockRulesContext
  * @package Brizy
  */
-class WPGlobalBlockRulesTransformer extends \Brizy\WPGlobalBlockRulesContext implements DataTransformerInterface
+class WPGlobalBlockRulesTransformer implements DataTransformerInterface
 {
     /**
      * @param ContextInterface $context
@@ -31,7 +31,7 @@ class WPGlobalBlockRulesTransformer extends \Brizy\WPGlobalBlockRulesContext imp
      * @return object
      * @throws \Exception
      */
-    public function migrateRules($globalBlock): object
+    public function migrateRules($globalBlock)
     {
         $newGlobalBlock = $globalBlock;
 
@@ -76,7 +76,7 @@ class WPGlobalBlockRulesTransformer extends \Brizy\WPGlobalBlockRulesContext imp
      * @param $rule
      * @return bool
      */
-    public function isItemRule($rule): bool
+    public function isItemRule($rule)
     {
         if (isset($rule->entityValues)) {
             return count($rule->entityValues) > 0;
@@ -106,7 +106,7 @@ class WPGlobalBlockRulesTransformer extends \Brizy\WPGlobalBlockRulesContext imp
      * @param $query
      * @return bool
      */
-    private function startsWiths($str, $query): bool
+    private function startsWiths($str, $query)
     {
         return substr($str, 0, strlen($query)) === $query;
     }
