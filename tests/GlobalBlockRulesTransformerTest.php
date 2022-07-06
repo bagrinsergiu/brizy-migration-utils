@@ -693,7 +693,7 @@ class GlobalBlockRulesTest extends TestCase
 
         $this->expectException(\Exception::class);
         $context = new GlobalBlockRulesContext($globalBlock, $collectionTypes);
-        $this->internalExecute($gbStr, $colTStr, $expectedStr, $context);
+        $this->internalExecute($expectedStr, $context);
     }
 
     /**
@@ -706,23 +706,19 @@ class GlobalBlockRulesTest extends TestCase
         $collectionTypes = $this->normalizeCollectionTypes(json_decode($colTStr));
 
         $context = new GlobalBlockRulesContext($globalBlock, $collectionTypes);
-        $this->internalExecute($gbStr, $colTStr, $expectedStr, $context);
+        $this->internalExecute($expectedStr, $context);
     }
 
     /**
-     * @param $gbStr
-     * @param $colTStr
      * @param $expectedStr
      * @param GlobalBlockRulesContext $context
      * @throws \Exception
      */
-    protected function internalExecute($gbStr, $colTStr, $expectedStr, GlobalBlockRulesContext $context): void
+    protected function internalExecute($expectedStr, GlobalBlockRulesContext $context): void
     {
-        $globalBlock = json_decode($gbStr);
-        $collectionTypes = $this->normalizeCollectionTypes(json_decode($colTStr));
         $expected = json_decode($expectedStr);
 
-        $transformer = new GlobalBlockRulesTransformer($globalBlock, $collectionTypes);
+        $transformer = new GlobalBlockRulesTransformer();
         $transformer->execute($context);
         $data = $context->getData();
 

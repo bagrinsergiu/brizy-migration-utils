@@ -17,7 +17,7 @@ class GlobalBlockRulesTransformer implements DataTransformerInterface
     public function execute(ContextInterface $context)
     {
         /**
-         * @var GlobalBlockRulesContext $context;
+         * @var GlobalBlockRulesContext $context ;
          */
 
         $data = $context->getData();
@@ -32,7 +32,7 @@ class GlobalBlockRulesTransformer implements DataTransformerInterface
      * @return object
      * @throws \Exception
      */
-    public function migrateRules($globalBlock, $collectionType)
+    public function migrateRules($globalBlock, $collectionTypes)
     {
         $newGlobalBlock = $globalBlock;
 
@@ -52,7 +52,9 @@ class GlobalBlockRulesTransformer implements DataTransformerInterface
                 $entityType = $rule->entityType;
                 $entityValues = $rule->entityValues;
 
-                $collectionType = $this->getCollectionById($entityType);
+                $collectionType = $this->find($collectionTypes, function ($type) use ($entityType) {
+                    return $type->id === $entityType;
+                });
 
                 if (isset($collectionType->fields)) {
                     $fieldsEntityValues = array_unique(array_reduce($collectionType->fields, function ($acc, $field) {
@@ -124,19 +126,6 @@ class GlobalBlockRulesTransformer implements DataTransformerInterface
         }
 
         return false;
-    }
-
-    /**
-     * @param $id
-     * @return bool
-     */
-    private function getCollectionById($id)
-    {
-        $collectionTypes = $this->getCollectionTypes();
-
-        return $this->find($collectionTypes, function ($type) use ($id) {
-            return $type->id === $id;
-        });
     }
 
     /**
