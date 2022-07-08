@@ -56,6 +56,12 @@ class GlobalBlockRulesTransformer implements DataTransformerInterface
                     return $type->id === $entityType;
                 });
 
+                // Skip Rule because the rule contain collectionType id
+                // with doesn't exist in the BD
+                if (!$collectionType) {
+                    continue;
+                }
+
                 if (isset($collectionType->fields)) {
                     $fieldsEntityValues = array_unique(array_reduce($collectionType->fields, function ($acc, $field) {
                         $fieldId = $field->id;
